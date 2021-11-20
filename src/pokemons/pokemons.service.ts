@@ -1,6 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePokemonDto } from './dto/create-pokemon.dto';
-import { UpdatePokemonDto } from './dto/update-pokemon.dto';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { CreatePokemonDto } from './create-pokemon.dto';
+import { UpdatePokemonDto } from './update-pokemon.dto';
+import CsvService from '../services/CsvService';
+import { PaginatedDto } from 'src/dto/PaginatedDto';
+import { PokemonDto } from './pokemon.dto';
+import Guard from 'src/guard/Guard';
+import _ from 'underscore';
+
+const dataPath = './src/pokemons/pokemons.csv';
+const csvService = new CsvService(dataPath);
+if (csvService.allLines.length === 0) {
+  console.log('Read called');
+  csvService.read();
+}
 
 @Injectable()
 export class PokemonsService {
@@ -8,12 +20,31 @@ export class PokemonsService {
     return 'This action adds a new pokemon';
   }
 
-  findAll() {
-    return `This action returns all pokemons`;
+  findAll(limit: number, offset: number) {
+    const paginatedDto = new PaginatedDto<PokemonDto>();
+    paginatedDto.limit = Guard.AgainstNegativeValueOrZero(limit);
+    paginatedDto.offset = Guard.AgainstNegativeValueOrZero(offset) - 1;
+
+    Guard.AgainstFirstValueGreaterThanSecondValue(
+      paginatedDto.limit,
+      paginatedDto.offset,
+    );
+
+    paginatedDto.results = csvService.allLines.slice(
+      paginatedDto.offset,
+      paginatedDto.limit,
+    );
+
+    paginatedDto.total = _.uniq(csvService.allLines, true).length;
+
+    return paginatedDto;
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} pokemon`;
+    const val = Guard.AgainstNegativeValueOrZero(id);
+    return csvService.allLines.filter((pokemon) => {
+      return pokemon['#'] === val;
+    });
   }
 
   update(id: number, updatePokemonDto: UpdatePokemonDto) {

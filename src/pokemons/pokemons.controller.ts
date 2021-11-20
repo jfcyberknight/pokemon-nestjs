@@ -8,8 +8,9 @@ import {
   Delete,
 } from '@nestjs/common';
 import { PokemonsService } from './pokemons.service';
-import { CreatePokemonDto } from './dto/create-pokemon.dto';
-import { UpdatePokemonDto } from './dto/update-pokemon.dto';
+import { CreatePokemonDto } from './create-pokemon.dto';
+import { UpdatePokemonDto } from './update-pokemon.dto';
+import Guard from 'src/guard/Guard';
 
 @Controller('pokemons')
 export class PokemonsController {
@@ -20,14 +21,14 @@ export class PokemonsController {
     return this.pokemonsService.create(createPokemonDto);
   }
 
-  @Get()
-  findAll() {
-    return this.pokemonsService.findAll();
+  @Get(':limit/:offset')
+  findAll(@Param('limit') limit: number, @Param('offset') offset: number) {
+    return this.pokemonsService.findAll(limit, offset);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pokemonsService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.pokemonsService.findOne(id);
   }
 
   @Patch(':id')
