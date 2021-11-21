@@ -1,9 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Joi = require('joi');
 
-export const PokemonSchema = Joi.object({
+export const pokemonSchema = Joi.object({
+  Id: Joi.number().required(),
   Name: Joi.string().required(),
-  Type1: Joi.number().required(),
+  Type1: Joi.string().required(),
   Type2: Joi.string().required(),
   Total: Joi.number().required(),
   Hp: Joi.number().required(),

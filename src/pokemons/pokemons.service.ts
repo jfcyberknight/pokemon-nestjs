@@ -1,33 +1,55 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const _ = require('lodash');
 import { Injectable } from '@nestjs/common';
-import { PaginatedDto } from 'src/dto/PaginatedDto';
+import { PaginatedDto } from '../dto/paginated.dto';
 import { PokemonDto } from './pokemon.dto';
-import { PokemonSchema } from './PokemonSchema';
-import CsvService from '../services/CsvService';
-import Guard from 'src/guard/Guard';
+import { PokemonFactory } from './pokemon.factory';
+import { pokemonSchema } from './pokemon.schema';
+import Guard from '../guard/guard';
+const Fs = require('fs');
+const CsvReadableStream = require('csv-reader');
 
-const dataPath = './src/pokemons/pokemons.csv';
-const csvService = new CsvService(dataPath);
-if (csvService.allLines.length === 0) {
-  csvService.read();
-}
 @Injectable()
 export class PokemonsService {
+  pokemonList = [];
+  constructor() {
+    const inputFile = './src/pokemons/pokemons.csv';
+    const inputStream = Fs.createReadStream(inputFile, 'utf8');
+    const that = this;
+    inputStream
+      .pipe(
+        new CsvReadableStream({
+          parseNumbers: true,
+          parseBooleans: true,
+          trim: true,
+          skipHeader: true,
+          asObject: true,
+        }),
+      )
+      .on('data', function (row) {
+        const pokemonDto = PokemonFactory.create(row);
+        that.pokemonList.push(pokemonDto);
+      });
+  }
+
   create(pokemonDto: PokemonDto) {
+    const pokemonDto2 = PokemonFactory.create(pokemonDto);
     Guard.AgainstAlreadyExistsInList(
-      pokemonDto,
+      pokemonDto2,
       'pokemonDto',
-      csvService.allLines,
+      this.pokemonList,
     );
-    Guard.AgainstBadSchema(pokemonDto, 'pokemonDto', PokemonSchema);
-    return csvService.allLines.push(pokemonDto);
+    Guard.AgainstBadSchema(pokemonDto2, 'pokemonDto', pokemonSchema);
+    this.pokemonList.push(pokemonDto2);
+
+    return pokemonDto2;
   }
 
   findAll(limit: number, offset: number) {
     const paginatedDto = new PaginatedDto<PokemonDto>();
     paginatedDto.limit = Guard.AgainstNegativeValueOrZero(limit, 'limit');
-    paginatedDto.offset = Guard.AgainstNegativeValueOrZero(offset, 'offset');
+    paginatedDto.offset = Guard.AgainstNegativeValue(offset, 'offset');
 
     Guard.AgainstFirstValueGreaterThanSecondValue(
       paginatedDto.limit,
@@ -36,30 +58,39 @@ export class PokemonsService {
       'offset',
     );
 
-    paginatedDto.results = csvService.allLines.slice(
-      paginatedDto.offset,
-      paginatedDto.limit,
-    );
+    paginatedDto.results = this.pokemonList
+      .slice(paginatedDto.offset, paginatedDto.limit)
+      .map((pokemon) => {
+        return PokemonFactory.create(pokemon);
+      });
 
-    paginatedDto.total = csvService.allLines.length;
+    paginatedDto.total = this.pokemonList.length;
 
     return paginatedDto;
   }
 
   findOne(id: number) {
     const val = Guard.AgainstNegativeValueOrZero(id, 'id');
-    return csvService.allLines.filter((pokemon) => {
-      return pokemon['#'] === val;
-    });
+    return this.pokemonList
+      .filter((pokemon) => {
+        return pokemon['#'] === val || pokemon.Id === val;
+      })
+      .map((pokemon) => {
+        return PokemonFactory.create(pokemon);
+      });
   }
 
   update(id: number, newPokemonDto: PokemonDto) {
-    Guard.AgainstBadSchema(newPokemonDto, 'newPokemonDto', PokemonSchema);
+    Guard.AgainstBadSchema(newPokemonDto, 'newPokemonDto', pokemonSchema);
     const pokemonFound = this.findOne(id);
-    const index = _.findIndex(csvService.allLines, pokemonFound[0]);
+    const index = _.findIndex(this.pokemonList, pokemonFound[0]);
 
     // Replace item at index using native splice
-    const oldPokemonDto = csvService.allLines.splice(index, 1, newPokemonDto);
+    const oldPokemonDto = this.pokemonList
+      .splice(index, 1, newPokemonDto)
+      .map((pokemon) => {
+        return PokemonFactory.create(pokemon);
+      });
     return {
       old: oldPokemonDto,
       new: newPokemonDto,
@@ -70,8 +101,8 @@ export class PokemonsService {
     const pokemonToRemove = this.findOne(id);
 
     if (pokemonToRemove[0]) {
-      _.remove(csvService.allLines, (pokemon) => {
-        return pokemon['#'] === pokemonToRemove[0]['#'];
+      _.remove(this.pokemonList, (pokemon) => {
+        return pokemon.Id === pokemonToRemove[0].Id;
       });
       return 'Ressource deleted succesfully';
     }

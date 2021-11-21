@@ -42,9 +42,9 @@ export default class Guard {
   static AgainstAlreadyExistsInList(
     value: any,
     valueNameOf: string,
-    list: Array<any>,
+    list: any[],
   ) {
-    if (_.findIndex(list, value)) {
+    if (_.findIndex(list, value) !== -1) {
       throw new BadRequestException(`Element [${valueNameOf}] already exists`);
     }
   }
