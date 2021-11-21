@@ -7,18 +7,16 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
+import { PokemonDto } from './pokemon.dto';
 import { PokemonsService } from './pokemons.service';
-import { CreatePokemonDto } from './create-pokemon.dto';
-import { UpdatePokemonDto } from './update-pokemon.dto';
-import Guard from 'src/guard/Guard';
 
 @Controller('pokemons')
 export class PokemonsController {
   constructor(private readonly pokemonsService: PokemonsService) {}
 
   @Post()
-  create(@Body() createPokemonDto: CreatePokemonDto) {
-    return this.pokemonsService.create(createPokemonDto);
+  create(@Body() pokemonDto: PokemonDto) {
+    return this.pokemonsService.create(pokemonDto);
   }
 
   @Get(':limit/:offset')
@@ -32,12 +30,12 @@ export class PokemonsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePokemonDto: UpdatePokemonDto) {
-    return this.pokemonsService.update(+id, updatePokemonDto);
+  update(@Param('id') id: number, @Body() pokemonDto: PokemonDto) {
+    return this.pokemonsService.update(id, pokemonDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pokemonsService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.pokemonsService.remove(id);
   }
 }
