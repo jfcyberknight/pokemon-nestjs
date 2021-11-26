@@ -7,8 +7,9 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { PokemonDto } from './pokemon.dto';
-import { PokemonsService } from './pokemons.service';
+import { PokemonDto } from 'src/pokemons/controller/dto/pokemon.dto';
+import { PokemonDtoFactory } from './dto/pokemon.dto.factory';
+import { PokemonsService } from '../services/pokemons.service';
 
 @Controller('pokemons')
 export class PokemonsController {
@@ -16,7 +17,7 @@ export class PokemonsController {
 
   @Post()
   create(@Body() pokemonDto: PokemonDto) {
-    return this.pokemonsService.create(pokemonDto);
+    return PokemonDtoFactory.create(this.pokemonsService.create(pokemonDto));
   }
 
   @Get(':limit/:offset')
@@ -26,12 +27,16 @@ export class PokemonsController {
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.pokemonsService.findOne(id);
+    const pokemonModel = this.pokemonsService.findOne(id);
+    if (pokemonModel) return PokemonDtoFactory.create(pokemonModel[0]);
+    return [];
   }
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() pokemonDto: PokemonDto) {
-    return this.pokemonsService.update(id, pokemonDto);
+    const pokemonModel = this.pokemonsService.update(id, pokemonDto);
+    if (pokemonModel) return PokemonDtoFactory.create(pokemonModel[0]);
+    return null;
   }
 
   @Delete(':id')
