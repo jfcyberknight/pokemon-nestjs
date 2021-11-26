@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable no-var */
+import { Injectable } from '@nestjs/common';
 import { BadRequestException } from '@nestjs/common/exceptions';
-var _ = require('lodash');
-export default class Guard {
+@Injectable()
+export class GuardServices {
   static AgainstNegativeValueOrZero(value: any, valueNameOf: string): number {
     const val = this.AgainstNegativeValue(value, valueNameOf);
     if (val <= 0) {
@@ -36,23 +35,6 @@ export default class Guard {
       throw new BadRequestException(
         `First value [${firstValueNameOf}] must be greater than second value [${secondValueNameOf}]`,
       );
-    }
-  }
-
-  static AgainstAlreadyExistsInList(
-    value: any,
-    valueNameOf: string,
-    list: any[],
-  ) {
-    if (_.findIndex(list, value) !== -1) {
-      throw new BadRequestException(`Element [${valueNameOf}] already exists`);
-    }
-  }
-
-  static AgainstBadSchema(dto: any, dtoNameOf: string, schema: any) {
-    const schemaValidation = schema.validate(dto);
-    if (schemaValidation.error) {
-      throw new BadRequestException(`Dto [${dtoNameOf}] must be valid`);
     }
   }
 }
