@@ -6,8 +6,9 @@ const _ = require('lodash');
 import { Injectable } from '@nestjs/common';
 import { PaginatedModel } from '../../core/services/paginated.model';
 import { PokemonEntityFactory } from './pokemon.entity.factory';
-import { PokemonModel } from '../services/pokemon.model';
-import { PokemonModelFactory } from '../services/pokemon.model.factory';
+import { PokemonModel } from '../services/models/pokemon.model';
+import { PokemonModelFactory } from '../services/models/pokemon.model.factory';
+import { PokemonsEntityGuardService } from './pokemons.entity.guard.service';
 @Injectable()
 export class PokemonRepository {
   pokemonList = [];
@@ -32,6 +33,11 @@ export class PokemonRepository {
   }
   create(pokemonModel: PokemonModel): PokemonModel {
     const pokemonEntity = PokemonEntityFactory.create(pokemonModel);
+    PokemonsEntityGuardService.AgainstBadSchema(pokemonEntity);
+    PokemonsEntityGuardService.AgainstAlreadyExistsInList(
+      pokemonEntity,
+      this.pokemonList,
+    );
     this.pokemonList.push(pokemonEntity);
     return PokemonModelFactory.create(pokemonEntity);
   }
@@ -68,11 +74,14 @@ export class PokemonRepository {
       PokemonEntityFactory.create(pokemonFound),
     );
 
-    return this.pokemonList
+    const pokemonEntity = this.pokemonList
       .splice(index, 1, newPokemonModel)
       .map((pokemonEntity) => {
         return PokemonModelFactory.create(pokemonEntity);
       });
+    PokemonsEntityGuardService.AgainstBadSchema(pokemonEntity[0]);
+
+    return pokemonEntity;
   }
 
   remove(pokemonToRemove: PokemonModel) {

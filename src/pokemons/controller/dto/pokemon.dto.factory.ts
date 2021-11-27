@@ -1,6 +1,6 @@
 import { PokemonDto } from './pokemon.dto';
 import { Injectable } from '@nestjs/common';
-import { PokemonModel } from 'src/pokemons/services/pokemon.model';
+import { PokemonModel } from 'src/pokemons/services/models/pokemon.model';
 
 @Injectable()
 export class PokemonDtoFactory {

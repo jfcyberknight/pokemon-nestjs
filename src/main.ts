@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { PokemonsModule } from './pokemons/pokemons.module';
+import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(PokemonsModule);
+  const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
     .setTitle('Pokemons API')
@@ -15,5 +15,4 @@ async function bootstrap() {
 
   await app.listen(3000);
 }
-
 bootstrap();

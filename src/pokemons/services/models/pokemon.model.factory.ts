@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PokemonEntity } from '../repository/pokemon.entity';
+import { PokemonEntity } from '../../repository/pokemon.entity';
 import { PokemonModel } from './pokemon.model';
 
 @Injectable()

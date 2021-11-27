@@ -45,9 +45,6 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-# Listening on port
-$ http://localhost:3000
-
 ## Test
 
 ```bash

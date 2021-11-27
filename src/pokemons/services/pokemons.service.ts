@@ -2,16 +2,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { GuardServices } from '../../core/services/guard-services';
 import { Injectable } from '@nestjs/common';
-import { PokemonModel } from './pokemon.model';
+import { PokemonModel } from './models/pokemon.model';
 import { PokemonRepository } from './../repository/pokemon.repository';
-import { PokemonsGuardService } from './pokemons.guard.service';
 
 @Injectable()
 export class PokemonsService {
   constructor(private pokemonRepository: PokemonRepository) {}
 
   create(pokemonModel: PokemonModel): PokemonModel {
-    PokemonsGuardService.AgainstBadSchema(pokemonModel);
     this.pokemonRepository.create(pokemonModel);
     return pokemonModel;
   }
@@ -28,7 +26,6 @@ export class PokemonsService {
   }
 
   update(id: number, newPokemonModel: PokemonModel) {
-    PokemonsGuardService.AgainstBadSchema(newPokemonModel);
     const val = GuardServices.AgainstNegativeValueOrZero(id, 'id');
     const pokemonFound = this.findOne(val);
     return this.pokemonRepository.update(newPokemonModel, pokemonFound[0]);
