@@ -43,6 +43,11 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+
+# docker mode
+$ npm run build
+$ docker build -t app .
+$ docker run -p 8888:3000 app
 ```
 
 ## Test
