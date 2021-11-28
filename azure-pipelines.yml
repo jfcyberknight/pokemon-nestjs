@@ -30,6 +30,11 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
+    - task: Docker@2
+      inputs:
+        command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+
     - task: NodeTool@0
       inputs:
         versionSpec: '10.x'
