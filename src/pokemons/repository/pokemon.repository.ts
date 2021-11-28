@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const CsvReadableStream = require('csv-reader');
-const Fs = require('fs');
 const _ = require('lodash');
 import { Injectable } from '@nestjs/common';
 import { PaginatedModel } from '../../core/services/paginated.model';
@@ -9,27 +7,13 @@ import { PokemonEntityFactory } from './pokemon.entity.factory';
 import { PokemonModel } from '../services/models/pokemon.model';
 import { PokemonModelFactory } from '../services/models/pokemon.model.factory';
 import { PokemonsEntityGuardService } from './pokemons.entity.guard.service';
+import * as pokemons from './pokemons.json';
 @Injectable()
 export class PokemonRepository {
   pokemonList = [];
   constructor() {
-    const inputFile = __dirname + '/pokemons.csv';
-    const inputStream = Fs.createReadStream(inputFile, 'utf8');
-    const that = this;
-    inputStream
-      .pipe(
-        new CsvReadableStream({
-          parseNumbers: true,
-          parseBooleans: true,
-          trim: true,
-          skipHeader: true,
-          asObject: true,
-        }),
-      )
-      .on('data', function (row) {
-        const pokemonEntity = PokemonEntityFactory.createFromCsv(row);
-        that.pokemonList.push(pokemonEntity);
-      });
+    console.log(pokemons.results[0]);
+    this.pokemonList = pokemons.results;
   }
   create(pokemonModel: PokemonModel): PokemonModel {
     const pokemonEntity = PokemonEntityFactory.create(pokemonModel);
