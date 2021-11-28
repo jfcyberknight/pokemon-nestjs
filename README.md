@@ -63,6 +63,20 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Deploy
+
+```bash
+# https://trilon.io/blog/deploying-nestjs-to-zeit-now
+
+$ npm i -g now
+
+$ now login
+
+$ npm run build && now
+
+$ nest build && now (mon npm run build ne fonctionnait pas)
+```
+
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
