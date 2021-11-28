@@ -1,7 +1,0 @@
-- task: AzureRmWebAppDeployment@4
-  inputs:
-    ConnectionType: 'AzureRM'
-    azureSubscription: 'Abonnement Azure 1(3ac56436-83a8-4860-b146-06de7bd5d28d)'
-    appType: 'webApp'
-    WebAppName: 'pokemon-api'
-    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
