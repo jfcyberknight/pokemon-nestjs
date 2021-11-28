@@ -33,7 +33,7 @@ stages:
     - task: Docker@2
       inputs:
         command: 'buildAndPush'
-      Dockerfile: '**/Dockerfile'
+        Dockerfile: '**/Dockerfile'
 
     - task: NodeTool@0
       inputs:
