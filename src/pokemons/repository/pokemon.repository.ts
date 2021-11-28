@@ -13,7 +13,7 @@ import { PokemonsEntityGuardService } from './pokemons.entity.guard.service';
 export class PokemonRepository {
   pokemonList = [];
   constructor() {
-    const inputFile = './src/pokemons/repository/pokemons.csv';
+    const inputFile = __dirname + '/pokemons.csv';
     const inputStream = Fs.createReadStream(inputFile, 'utf8');
     const that = this;
     inputStream
