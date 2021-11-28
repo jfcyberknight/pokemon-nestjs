@@ -1,10 +1,13 @@
 {
-  "name": "",
+  "name": "pokemon-api",
   "version": "0.0.1",
   "description": "",
-  "author": "",
-  "private": true,
+  "author": "Vallée Jean-François",
+  "private": false,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "14.x"
+  },  
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
