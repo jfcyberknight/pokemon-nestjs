@@ -63,19 +63,42 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Deploy
+## Deploy on Heroku
+
+- Install Heroku client
+  - https://devcenter.heroku.com/articles/getting-started-with-nodejs#set-up
+- Create Procfile
+  - https://devcenter.heroku.com/articles/getting-started-with-nodejs#define-a-procfile
+  - at the root of application
+  - web: npm run start:prod
+- Todo
+  - https://devcenter.heroku.com/articles/getting-started-with-nodejs#declare-app-dependencies
 
 ```bash
-# https://trilon.io/blog/deploying-nestjs-to-zeit-now
 
-$ npm i -g now
+$ heroku login
 
-$ now login
+$ git add .
 
-$ npm run build && now
+$ git commit -m "Your message"
 
-$ nest build && now (mon npm run build ne fonctionnait pas)
+$ git push heroku main
+
+$ heroku open
 ```
+
+# Heroku
+- https://devcenter.heroku.com/articles/getting-started-with-nodejs#run-the-app-locally
+```bash
+$ heroku local web
+```
+
+- https://devcenter.heroku.com/articles/getting-started-with-nodejs#view-logs
+```bash
+$ heroku logs --tail
+```
+
+
 
 ## Support
 
