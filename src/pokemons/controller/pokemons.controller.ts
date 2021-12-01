@@ -27,15 +27,15 @@ export class PokemonsController {
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    const pokemonModel = this.pokemonsService.findOne(id);
-    if (pokemonModel) return PokemonDtoFactory.create(pokemonModel[0]);
+    const pokemonModel = this.pokemonsService.findOne(id)[0];
+    if (pokemonModel) return PokemonDtoFactory.create(pokemonModel);
     return [];
   }
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() pokemonDto: PokemonDto) {
     const pokemonModel = this.pokemonsService.update(id, pokemonDto);
-    if (pokemonModel) return PokemonDtoFactory.create(pokemonModel[0]);
+    if (pokemonModel) return PokemonDtoFactory.create(pokemonModel);
     return null;
   }
 

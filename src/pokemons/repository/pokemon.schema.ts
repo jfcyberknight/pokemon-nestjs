@@ -6,6 +6,7 @@ const Joi = require('joi');
 @Injectable()
 export class PokemonSchema {
   schema = Joi.object({
+    Id: Joi.number().required(),
     Name: Joi.string().required(),
     Type1: Joi.string().required(),
     Type2: Joi.string().required(),
@@ -18,5 +19,5 @@ export class PokemonSchema {
     Speed: Joi.number().required(),
     Generation: Joi.number().required(),
     Legendary: Joi.bool().required(),
-  });
+  }).options({ stripUnknown: true });
 }

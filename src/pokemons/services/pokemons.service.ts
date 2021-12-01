@@ -10,8 +10,8 @@ export class PokemonsService {
   constructor(private pokemonRepository: PokemonRepository) {}
 
   create(pokemonModel: PokemonModel): PokemonModel {
-    this.pokemonRepository.create(pokemonModel);
-    return pokemonModel;
+    const pokemonCreated = this.pokemonRepository.create(pokemonModel);
+    return pokemonCreated;
   }
 
   findAll(limit: number, offset: number) {
@@ -27,13 +27,18 @@ export class PokemonsService {
 
   update(id: number, newPokemonModel: PokemonModel) {
     const val = GuardServices.AgainstNegativeValueOrZero(id, 'id');
-    const pokemonFound = this.findOne(val);
-    return this.pokemonRepository.update(newPokemonModel, pokemonFound[0]);
+    const pokemonFound = this.findOne(val)[0];
+    const pokemonUpdated = this.pokemonRepository.update(
+      newPokemonModel,
+      pokemonFound,
+    );
+
+    return pokemonUpdated;
   }
 
   remove(id: number) {
     const val = GuardServices.AgainstNegativeValueOrZero(id, 'id');
-    const pokemonFound = this.findOne(val);
-    return this.pokemonRepository.remove(pokemonFound[0]);
+    const pokemonFound = this.findOne(val)[0];
+    return this.pokemonRepository.remove(pokemonFound);
   }
 }

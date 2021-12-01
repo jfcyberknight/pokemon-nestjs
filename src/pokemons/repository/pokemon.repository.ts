@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const _ = require('lodash');
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PaginatedModel } from '../../core/services/paginated.model';
 import { PokemonEntityFactory } from './pokemon.entity.factory';
 import { PokemonModel } from '../services/models/pokemon.model';
@@ -12,7 +12,6 @@ import * as pokemons from './pokemons.json';
 export class PokemonRepository {
   pokemonList = [];
   constructor() {
-    console.log(pokemons.results[0]);
     this.pokemonList = pokemons.results;
   }
   create(pokemonModel: PokemonModel): PokemonModel {
@@ -22,8 +21,11 @@ export class PokemonRepository {
       pokemonEntity,
       this.pokemonList,
     );
+
+    const pokemonModelCreated = PokemonModelFactory.create(pokemonEntity);
     this.pokemonList.push(pokemonEntity);
-    return PokemonModelFactory.create(pokemonEntity);
+
+    return pokemonModelCreated;
   }
 
   findAll(limit: number, offset: number) {
@@ -45,7 +47,7 @@ export class PokemonRepository {
   findOne(id: number) {
     return this.pokemonList
       .filter((pokemonEntity) => {
-        return pokemonEntity['#'] === id;
+        return pokemonEntity.Id === id;
       })
       .map((pokemon) => {
         return PokemonModelFactory.create(pokemon);
@@ -53,25 +55,26 @@ export class PokemonRepository {
   }
 
   update(newPokemonModel: PokemonModel, pokemonFound: PokemonModel) {
-    const index = _.findIndex(
-      this.pokemonList,
-      PokemonEntityFactory.create(pokemonFound),
-    );
+    const index = _.findIndex(this.pokemonList, pokemonFound);
 
-    const pokemonEntity = this.pokemonList
-      .splice(index, 1, newPokemonModel)
-      .map((pokemonEntity) => {
-        return PokemonModelFactory.create(pokemonEntity);
-      });
-    PokemonsEntityGuardService.AgainstBadSchema(pokemonEntity[0]);
+    if (index > -1) {
+      const elementDeleted = this.pokemonList.splice(
+        index,
+        1,
+        newPokemonModel,
+      )[0];
+      if (elementDeleted) {
+        return newPokemonModel;
+      }
+    }
 
-    return pokemonEntity;
+    throw new BadRequestException(`[pokemonEntity] not updated`);
   }
 
   remove(pokemonToRemove: PokemonModel) {
     if (pokemonToRemove) {
       _.remove(this.pokemonList, (pokemonEntity) => {
-        return pokemonEntity['#'] === pokemonToRemove.Id;
+        return pokemonEntity.Id === pokemonToRemove.Id;
       });
       return 'Ressource deleted succesfully';
     }
